@@ -69,6 +69,7 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/tr
 
 # Things I want to try
 
+- Get some kind of hello world example running
 - Keeping track of state
 - Create a "container" component, containing dynamic children
 - Handling forms
