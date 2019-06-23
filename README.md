@@ -70,6 +70,9 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/tr
 # Things I want to try
 
 - Keeping track of state
+- Create a "container" component, containing dynamic children
+- Handling forms
+- Handling forms with file uploads
 - See which tooling I need
 - Check how to defer elements that are not visible to save memory
 - Check how to sync something between client / server
@@ -82,3 +85,7 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/tr
 - Navigation
 - Creating a component with some events
 - Including a non-react library
+
+---
+
+Formik? https://jaredpalmer.com/formik/
