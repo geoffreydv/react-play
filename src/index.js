@@ -39,30 +39,24 @@ class ModelConfigurationPage extends React.Component {
                                             segments: [
                                                 {
                                                     name: "Segment One",
-                                                    parameters: [
-                                                        {
-                                                            name: "Parameter One",
-                                                            value: "Value Of Parameter 1"
-                                                        }
-                                                    ]
+                                                    parameters: {
+                                                        parameterOne: "One",
+                                                        parameterTwo: false
+                                                    }
                                                 },
                                                 {
                                                     name: "Segment Two",
-                                                    parameters: [
-                                                        {
-                                                            name: "Parameter One",
-                                                            value: "Value Of Parameter 1"
-                                                        }
-                                                    ]
+                                                    parameters: {
+                                                        parameterOne: "One",
+                                                        parameterTwo: true
+                                                    }
                                                 },
                                                 {
                                                     name: "Segment Three",
-                                                    parameters: [
-                                                        {
-                                                            name: "Parameter One",
-                                                            value: "Value Of Parameter 1"
-                                                        }
-                                                    ]
+                                                    parameters: {
+                                                        parameterOne: "One",
+                                                        parameterTwo: false
+                                                    }
                                                 }
                                             ]
                                         }
@@ -78,30 +72,24 @@ class ModelConfigurationPage extends React.Component {
                                             segments: [
                                                 {
                                                     name: "Segment One",
-                                                    parameters: [
-                                                        {
-                                                            name: "Parameter One",
-                                                            value: "Value Of Parameter 1"
-                                                        }
-                                                    ]
+                                                    parameters: {
+                                                        parameterOne: "One",
+                                                        parameterTwo: true
+                                                    }
                                                 },
                                                 {
                                                     name: "Segment Two",
-                                                    parameters: [
-                                                        {
-                                                            name: "Parameter One",
-                                                            value: "Value Of Parameter 1"
-                                                        }
-                                                    ]
+                                                    parameters: {
+                                                        parameterOne: "One",
+                                                        parameterTwo: true
+                                                    }
                                                 },
                                                 {
                                                     name: "Segment Three",
-                                                    parameters: [
-                                                        {
-                                                            name: "Parameter One",
-                                                            value: "Value Of Parameter 1"
-                                                        }
-                                                    ]
+                                                    parameters: {
+                                                        parameterOne: "One",
+                                                        parameterTwo: true
+                                                    }
                                                 }
                                             ]
                                         }
@@ -165,7 +153,7 @@ class ModelConfigurationOverviewActionBar extends React.Component {
                     <select name="model-selection" value={this.props.selectedModelVersionIndex}>
                         <option value="none"/>
                         {
-                            this.props.selectedModelIndex && this.props.availableModels[this.props.selectedModelIndex].availableVersions.map((version, i) => {
+                            this.props.availableModels[this.props.selectedModelIndex].availableVersions.map((version, i) => {
                                 return <option
                                     key={i}
                                     value={i}
@@ -183,7 +171,10 @@ class ModelConfigurationDetails extends React.Component {
     render() {
         return (
             <div>
+
                 <h2>{this.props.model.name}</h2>
+
+                <SelectedModelActionBar editMode={this.props.editMode}/>
 
                 <SubmodelNavigationTabs
                     submodels={this.props.model.submodels}
@@ -203,7 +194,17 @@ class ModelConfigurationDetails extends React.Component {
             </div>
         );
     }
+}
 
+class SelectedModelActionBar extends React.Component {
+    render() {
+        return (
+            <div>
+                <button hidden={this.props.editMode} className="btn btn-outline-primary">Edit Configuration</button>
+                <button hidden={!this.props.editMode} className="btn btn-outline-primary">Discard Changes</button>
+            </div>
+        );
+    }
 }
 
 class SubmodelNavigationTabs extends React.Component {
@@ -310,19 +311,35 @@ class EadParameters extends React.Component {
                 <tbody>
                 <tr>
                     <td>Parameter One</td>
-                    <td>{this.props.editMode ? (
-                        <input type="text"/>
-                    ) : (
-                        <span>Not editing</span>
-                    )}</td>
+                    <td>
+                        <EditableTextValue editable={this.props.editMode}
+                                           value={this.props.parameters['parameterOne']}/>
+                    </td>
                 </tr>
 
                 <tr>
                     <td>Parameter Two</td>
-                    <td>Value Two</td>
+                    <td>
+                        <input type="checkbox" checked={this.props.parameters['parameterTwo']}
+                               disabled={!this.props.editMode}/>
+                    </td>
                 </tr>
                 </tbody>
             </table>
+        );
+    }
+}
+
+class EditableTextValue extends React.Component {
+    render() {
+        return (
+            <span>
+                {this.props.editable
+                    ? (<input type="text" value={this.props.value}/>)
+                    : (this.props.value)
+                }
+            </span>
+
         );
     }
 }
