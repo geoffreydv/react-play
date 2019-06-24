@@ -1,119 +1,181 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import 'bootstrap/dist/css/bootstrap.css';
 import './index.css';
 
-function Square(props) {
-    return (
-        <button className="square" onClick={props.onClick}>
-            {props.value}
-        </button>
-    )
-}
-
-class Board extends React.Component {
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            squares: Array(9).fill(null),
-            xIsNext: true
-        }
-    }
-
-    handleClick(i) {
-        const squares = this.state.squares.slice();
-
-        if(calculateWinner(squares) || squares[i]) {
-            return;
-        }
-
-        squares[i] = this.state.xIsNext ? "X" : 'O';
-        this.setState({
-            squares: squares,
-            xIsNext: !this.state.xIsNext
-        });
-    }
-
-    renderSquare(i) {
-        return <Square
-            value={this.state.squares[i]}
-            onClick={() => this.handleClick(i)}
-        />;
-    }
-
+class ApplicationFrame extends React.Component {
     render() {
-
-        const winner = calculateWinner(this.state.squares);
-
-        let status;
-        if(winner) {
-            status = "Winner: " + winner;
-        } else {
-            status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
-        }
-
         return (
             <div>
-                <div className="status">{status}</div>
-                <div className="board-row">
-                    {this.renderSquare(0)}
-                    {this.renderSquare(1)}
-                    {this.renderSquare(2)}
-                </div>
-                <div className="board-row">
-                    {this.renderSquare(3)}
-                    {this.renderSquare(4)}
-                    {this.renderSquare(5)}
-                </div>
-                <div className="board-row">
-                    {this.renderSquare(6)}
-                    {this.renderSquare(7)}
-                    {this.renderSquare(8)}
+                <NavBar/>
+
+                <div className="container">
+                    <ModelConfigurationOverview/>
                 </div>
             </div>
+        )
+    }
+}
+
+class NavBar extends React.Component {
+    render() {
+        return (
+            <nav className="navbar navbar-expand-sm bg-light">
+                <ul className="navbar-nav">
+                    <li className="nav-item">
+                        <a className="nav-link" href="#">Link 1</a>
+                    </li>
+                    <li className="nav-item">
+                        <a className="nav-link" href="#">Link 2</a>
+                    </li>
+                    <li className="nav-item">
+                        <a className="nav-link" href="#">Link 3</a>
+                    </li>
+                </ul>
+
+            </nav>
+        )
+    }
+}
+
+class ModelConfigurationOverview extends React.Component {
+    render() {
+        return (
+            <div>
+                <div>
+                    <h1>Model Configurations</h1>
+                    <ModelConfigurationOverviewActionBar/>
+                </div>
+
+                <ModelConfigurationViewer/>
+            </div>
+        )
+    }
+}
+
+class ModelConfigurationOverviewActionBar extends React.Component {
+    render() {
+        return (
+            <form>
+                <label>Select Configuration
+                    <select name="model-selection">
+                        <option value="none"/>
+                        <option value="opt-1">A Model Config</option>
+                    </select>
+                </label>
+
+                <label>Version
+                    <select name="model-selection">
+                        <option value="none"/>
+                        <option value="version1">V1</option>
+                        <option value="version2">V2</option>
+                    </select>
+                </label>
+            </form>
         );
     }
 }
 
-class Game extends React.Component {
+class ModelConfigurationViewer extends React.Component {
+
     render() {
         return (
-            <div className="game">
-                <div className="game-board">
-                    <Board/>
-                </div>
-                <div className="game-info">
-                    <div>{/* status */}</div>
-                    <ol>{/* TODO */}</ol>
-                </div>
+            <div>
+                <h2>This is the selected model</h2>
+
+                <SubmodelNavigationTabs/>
+
+                <OverviewPanel/>
+                <SubModelPanel/>
+                <SubModelPanel/>
+                <SubModelPanel/>
             </div>
+        );
+    }
+
+}
+
+class SubmodelNavigationTabs extends React.Component {
+    render() {
+        return (
+            <ul className="nav nav-tabs">
+                <li className="nav-item">
+                    <a className="nav-link active" href="#">EAD</a>
+                </li>
+                <li className="nav-item">
+                    <a className="nav-link" href="#">PD</a>
+                </li>
+                <li className="nav-item">
+                    <a className="nav-link" href="#">LGD</a>
+                </li>
+            </ul>
+        )
+    }
+}
+
+class OverviewPanel extends React.Component {
+    render() {
+        return (
+            <div>
+                <h3>This is the overview panel</h3>
+            </div>
+        )
+    }
+}
+
+class SubModelPanel extends React.Component {
+    render() {
+        return (
+            <div>
+                <h3>This is the panel for submodel: "EAD"</h3>
+
+                <ScenarioPanel/>
+            </div>
+        )
+    }
+}
+
+class ScenarioPanel extends React.Component {
+    render() {
+        return (
+            <div>
+                <form>
+                    <label>Select Scenario
+                        <select name="scenario-selection">
+                            <option value="none"/>
+                            <option value="opt-1">Scenario 1</option>
+                        </select>
+                    </label>
+                </form>
+
+                <SpecificSubmodelConfigurations />
+            </div>
+        )
+    }
+}
+
+class SpecificSubmodelConfigurations extends React.Component {
+    render() {
+        return (
+            <table className="table">
+                <tr>
+                    <td>Parameter One</td>
+                    <td>Value One</td>
+                </tr>
+
+                <tr>
+                    <td>Parameter Two</td>
+                    <td>Value Two</td>
+                </tr>
+            </table>
         );
     }
 }
 
 // ========================================
 
+
 ReactDOM.render(
-    <Game/>,
+    <ApplicationFrame/>,
     document.getElementById('root')
 );
-
-function calculateWinner(squares) {
-    const lines = [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [2, 4, 6],
-    ];
-    for (let i = 0; i < lines.length; i++) {
-        const [a, b, c] = lines[i];
-        if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-            return squares[a];
-        }
-    }
-    return null;
-}
