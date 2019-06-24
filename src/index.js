@@ -1,39 +1,122 @@
 import React from 'react';
+import _ from 'underscore'
+import ApplicationFrame from "./Fluff";
 import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.css';
 import './index.css';
 
-class ApplicationFrame extends React.Component {
+
+class ModelConfigurationPage extends React.Component {
+
     render() {
         return (
-            <div>
-                <NavBar/>
-
-                <div className="container">
-                    <ModelConfigurationOverview/>
-                </div>
-            </div>
-        )
-    }
-}
-
-class NavBar extends React.Component {
-    render() {
-        return (
-            <nav className="navbar navbar-expand-sm bg-light">
-                <ul className="navbar-nav">
-                    <li className="nav-item">
-                        <a className="nav-link" href="#">Link 1</a>
-                    </li>
-                    <li className="nav-item">
-                        <a className="nav-link" href="#">Link 2</a>
-                    </li>
-                    <li className="nav-item">
-                        <a className="nav-link" href="#">Link 3</a>
-                    </li>
-                </ul>
-
-            </nav>
+            <ApplicationFrame>
+                <ModelConfigurationOverview
+                    basicDataOfModels={
+                        [
+                            {
+                                name: "Model 1",
+                                availableVersions: ["1", "2"]
+                            },
+                            {
+                                name: "GeoffreyModel",
+                                availableVersions: ["1"]
+                            }
+                        ]
+                    }
+                    activeModelDetails={
+                        {
+                            name: "Model 1",
+                            version: 2,
+                            submodels: [
+                                {
+                                    displayName: "EAD",
+                                    technicalName: "ead",
+                                    scenarios: [
+                                        {
+                                            id: "1",
+                                            name: "Scenario 1",
+                                            segments: [
+                                                {
+                                                    name: "Segment One",
+                                                    parameters: [
+                                                        {
+                                                            name: "Parameter One",
+                                                            value: "Value Of Parameter 1"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    name: "Segment Two",
+                                                    parameters: [
+                                                        {
+                                                            name: "Parameter One",
+                                                            value: "Value Of Parameter 1"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    name: "Segment Three",
+                                                    parameters: [
+                                                        {
+                                                            name: "Parameter One",
+                                                            value: "Value Of Parameter 1"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    displayName: "PD",
+                                    technicalName: "pd",
+                                    scenarios: [
+                                        {
+                                            id: "2",
+                                            name: "Scenario 1",
+                                            segments: [
+                                                {
+                                                    name: "Segment One",
+                                                    parameters: [
+                                                        {
+                                                            name: "Parameter One",
+                                                            value: "Value Of Parameter 1"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    name: "Segment Two",
+                                                    parameters: [
+                                                        {
+                                                            name: "Parameter One",
+                                                            value: "Value Of Parameter 1"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    name: "Segment Three",
+                                                    parameters: [
+                                                        {
+                                                            name: "Parameter One",
+                                                            value: "Value Of Parameter 1"
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                    modelDropdownSelectedIndex={0}
+                    modelVersionDropdownSelectedIndex={1}
+                    openSubmodelCode="pd"
+                    selectedScenarioId="1"
+                    editMode={false}
+                />
+            </ApplicationFrame>
         )
     }
 }
@@ -43,11 +126,22 @@ class ModelConfigurationOverview extends React.Component {
         return (
             <div>
                 <div>
+
                     <h1>Model Configurations</h1>
-                    <ModelConfigurationOverviewActionBar/>
+
+                    <ModelConfigurationOverviewActionBar
+                        availableModels={this.props.basicDataOfModels}
+                        selectedModelIndex={this.props.modelDropdownSelectedIndex}
+                        selectedModelVersionIndex={this.props.modelVersionDropdownSelectedIndex}
+                    />
                 </div>
 
-                <ModelConfigurationViewer/>
+                <ModelConfigurationDetails
+                    model={this.props.activeModelDetails}
+                    selectedScenarioId={this.props.selectedScenarioId}
+                    openSubmodelCode={this.props.openSubmodelCode}
+                    editMode={this.props.editMode}
+                />
             </div>
         )
     }
@@ -58,17 +152,25 @@ class ModelConfigurationOverviewActionBar extends React.Component {
         return (
             <form>
                 <label>Select Configuration
-                    <select name="model-selection">
-                        <option value="none"/>
-                        <option value="opt-1">A Model Config</option>
+                    <select name="model-selection" value={this.props.selectedModelIndex}>
+                        <option/>
+                        {this.props.availableModels.map((model, i) => {
+                            return <option key={i}
+                                           value={i}>{model.name}</option>
+                        })}
                     </select>
                 </label>
 
                 <label>Version
-                    <select name="model-selection">
+                    <select name="model-selection" value={this.props.selectedModelVersionIndex}>
                         <option value="none"/>
-                        <option value="version1">V1</option>
-                        <option value="version2">V2</option>
+                        {
+                            this.props.selectedModelIndex && this.props.availableModels[this.props.selectedModelIndex].availableVersions.map((version, i) => {
+                                return <option
+                                    key={i}
+                                    value={i}
+                                >{version}</option>
+                            })}
                     </select>
                 </label>
             </form>
@@ -76,19 +178,28 @@ class ModelConfigurationOverviewActionBar extends React.Component {
     }
 }
 
-class ModelConfigurationViewer extends React.Component {
+class ModelConfigurationDetails extends React.Component {
 
     render() {
         return (
             <div>
-                <h2>This is the selected model</h2>
+                <h2>{this.props.model.name}</h2>
 
-                <SubmodelNavigationTabs/>
+                <SubmodelNavigationTabs
+                    submodels={this.props.model.submodels}
+                    openSubmodelCode={this.props.openSubmodelCode}
+                />
 
                 <OverviewPanel/>
-                <SubModelPanel/>
-                <SubModelPanel/>
-                <SubModelPanel/>
+
+                {this.props.model.submodels.map(submodel => {
+                    return <SubModelPanel
+                        key={submodel.technicalName}
+                        submodel={submodel}
+                        selectedScenarioId={this.props.selectedScenarioId}
+                        editMode={this.props.editMode}
+                    />
+                })}
             </div>
         );
     }
@@ -99,15 +210,13 @@ class SubmodelNavigationTabs extends React.Component {
     render() {
         return (
             <ul className="nav nav-tabs">
-                <li className="nav-item">
-                    <a className="nav-link active" href="#">EAD</a>
-                </li>
-                <li className="nav-item">
-                    <a className="nav-link" href="#">PD</a>
-                </li>
-                <li className="nav-item">
-                    <a className="nav-link" href="#">LGD</a>
-                </li>
+                {this.props.submodels.map(submodel => {
+                    return (
+                        <li key={submodel.technicalName} className="nav-item">
+                            <a className={"nav-link" + (this.props.openSubmodelCode === submodel.technicalName ? " active" : "")}
+                               href='#'>{submodel.displayName}</a>
+                        </li>)
+                })}
             </ul>
         )
     }
@@ -127,9 +236,14 @@ class SubModelPanel extends React.Component {
     render() {
         return (
             <div>
-                <h3>This is the panel for submodel: "EAD"</h3>
+                <h3>This is the panel for submodel: "{this.props.submodel.displayName}"</h3>
 
-                <ScenarioPanel/>
+                <ScenarioPanel
+                    scenarios={this.props.submodel.scenarios}
+                    selectedScenarioId={this.props.selectedScenarioId}
+                    submodelType={this.props.submodel.technicalName}
+                    editMode={this.props.editMode}
+                />
             </div>
         )
     }
@@ -137,36 +251,77 @@ class SubModelPanel extends React.Component {
 
 class ScenarioPanel extends React.Component {
     render() {
+
+        const me = this;
+
+        let segmentPanels = [];
+
+        if (this.props.selectedScenarioId) {
+
+            const activeScenario = _.findWhere(this.props.scenarios, {
+                id: me.props.selectedScenarioId
+            });
+
+            if (activeScenario) {
+
+                segmentPanels = activeScenario.segments.map(segment => {
+                    if (me.props.submodelType === "ead") {
+                        return (
+                            <div>
+                                <h4>{segment.name}</h4>
+                                <EadParameters parameters={segment.parameters} editMode={me.props.editMode}/>
+                            </div>
+                        );
+                    } else {
+                        return <div className="alert alert-danger">Unknown submodel: {me.props.submodelType} </div>;
+                    }
+                })
+            }
+        }
+
         return (
             <div>
                 <form>
                     <label>Select Scenario
-                        <select name="scenario-selection">
+                        <select value={this.props.selectedScenarioId} name="scenario-selection">
                             <option value="none"/>
-                            <option value="opt-1">Scenario 1</option>
+                            {
+                                this.props.scenarios.map(scenario => {
+                                    return <option
+                                        key={scenario.id}
+                                        value={scenario.id}>{scenario.name}</option>
+                                })
+                            }
                         </select>
                     </label>
                 </form>
 
-                <SpecificSubmodelConfigurations />
+                {segmentPanels}
+
             </div>
         )
     }
 }
 
-class SpecificSubmodelConfigurations extends React.Component {
+class EadParameters extends React.Component {
     render() {
         return (
             <table className="table">
+                <tbody>
                 <tr>
                     <td>Parameter One</td>
-                    <td>Value One</td>
+                    <td>{this.props.editMode ? (
+                        <input type="text"/>
+                    ) : (
+                        <span>Not editing</span>
+                    )}</td>
                 </tr>
 
                 <tr>
                     <td>Parameter Two</td>
                     <td>Value Two</td>
                 </tr>
+                </tbody>
             </table>
         );
     }
@@ -176,6 +331,6 @@ class SpecificSubmodelConfigurations extends React.Component {
 
 
 ReactDOM.render(
-    <ApplicationFrame/>,
+    <ModelConfigurationPage/>,
     document.getElementById('root')
 );
